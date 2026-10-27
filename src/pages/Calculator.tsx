@@ -18,7 +18,7 @@ export default function Calculator() {
 
   return (
     <>
-      <PageHead kicker="Alat bantu" title="Kalkulator kebutuhan" />
+      <PageHead back={{ to: '/panduan', label: 'Panduan' }} kicker="Alat bantu" title="Kalkulator kebutuhan" />
       <section className="card form">
         <label>Jumlah tanaman<input type="number" inputMode="numeric" min={0} value={plants} onChange={(e) => setPlants(e.target.value)} /></label>
         <label>Lubang susulan / tanaman

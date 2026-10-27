@@ -17,8 +17,7 @@ export default function Guide() {
     const prev = GUIDE[i - 1], next = GUIDE[i + 1];
     return (
       <>
-        <Link to="/panduan" className="back">‹ Panduan</Link>
-        <PageHead kicker={`Bagian ${i + 1} dari ${GUIDE.length}`} title={sec.title} />
+        <PageHead back={{ to: '/panduan', label: 'Panduan' }} kicker={`Bagian ${i + 1} dari ${GUIDE.length}`} title={sec.title} />
         <Blocks blocks={sec.blocks} />
         <div className="pager">
           {prev ? <Link to={`/panduan/${prev.id}`}>‹ {prev.title}</Link> : <span />}
@@ -33,10 +32,10 @@ export default function Guide() {
     <>
       <PageHead kicker="Referensi" title="Panduan Mas Udin" />
       <input className="search" type="search" placeholder="Cari: mankozeb, thrips, pH…" value={q} onChange={(e) => setQ(e.target.value)} />
-      <Link to="/diagnosa" className="plot diag">
-        <div className="plot-top"><b>🩺 Diagnosa gejala</b></div>
-        <div className="muted">Gejala → kemungkinan penyebab → tindakan</div>
-      </Link>
+      <div className="two">
+        <Link to="/diagnosa" className="plot diag"><div className="plot-top"><b>Diagnosa gejala</b></div><div className="muted small">Gejala → penyebab → tindakan</div></Link>
+        <Link to="/kalkulator" className="plot diag"><div className="plot-top"><b>Kalkulator</b></div><div className="muted small">Kebutuhan larutan & pupuk</div></Link>
+      </div>
       <div className="legend">
         <span><Badge s="SOP" /> dari SOP/wawancara</span>
         <span><Badge s="SARAN" /> saran tambahan</span>

@@ -1,8 +1,8 @@
 import { useSyncExternalStore } from 'react';
-import type { AppState, Harvest, Planting } from './types';
+import type { AppState, Entry, Harvest, Planting, Product } from './types';
 
 const KEY = 'sobat-cabe:v1';
-const initial: AppState = { plantings: [], harvests: [], done: {}, settings: { notify: false, endHst: 180 } };
+const initial: AppState = { plantings: [], entries: [], customProducts: [], shopDone: {}, harvests: [], done: {}, settings: { notify: false, endHst: 180 } };
 
 function load(): AppState {
   try {
@@ -40,13 +40,35 @@ export const actions = {
   },
   removePlanting(id: string) {
     const done = Object.fromEntries(Object.entries(state.done).filter(([k]) => !k.startsWith(id + ':')));
-    set({ ...state, plantings: state.plantings.filter((p) => p.id !== id), harvests: state.harvests.filter((h) => h.plantingId !== id), done });
+    const shopDone = Object.fromEntries(Object.entries(state.shopDone).filter(([k]) => !k.startsWith(id + ':')));
+    set({
+      ...state, done, shopDone,
+      plantings: state.plantings.filter((p) => p.id !== id),
+      harvests: state.harvests.filter((h) => h.plantingId !== id),
+      entries: state.entries.map((e) => (e.plantingId === id ? { ...e, plantingId: undefined } : e))
+    });
   },
   toggleDone(pid: string, key: string, date: string) {
     const k = `${pid}:${key}`;
     const done = { ...state.done };
     if (done[k]) delete done[k]; else done[k] = date;
     set({ ...state, done });
+  },
+  toggleShop(pid: string, productId: string) {
+    const k = `${pid}:${productId}`;
+    const shopDone = { ...state.shopDone };
+    if (shopDone[k]) delete shopDone[k]; else shopDone[k] = true;
+    set({ ...state, shopDone });
+  },
+  addEntry(e: Omit<Entry, 'id'>) { set({ ...state, entries: [...state.entries, { ...e, id: uid() }] }); },
+  removeEntry(id: string) { set({ ...state, entries: state.entries.filter((e) => e.id !== id) }); },
+  addProduct(p: Omit<Product, 'id' | 'custom'>) {
+    const id = 'c-' + uid();
+    set({ ...state, customProducts: [...state.customProducts, { ...p, id, custom: true }] });
+    return id;
+  },
+  removeProduct(id: string) {
+    set({ ...state, customProducts: state.customProducts.filter((p) => p.id !== id), entries: state.entries.filter((e) => e.productId !== id) });
   },
   addHarvest(h: Omit<Harvest, 'id'>) { set({ ...state, harvests: [...state.harvests, { ...h, id: uid() }] }); },
   removeHarvest(id: string) { set({ ...state, harvests: state.harvests.filter((h) => h.id !== id) }); },

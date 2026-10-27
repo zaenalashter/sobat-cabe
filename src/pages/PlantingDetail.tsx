@@ -6,6 +6,7 @@ import { diffDays, fmt, todayISO } from '../lib/date';
 import { Empty, PageHead, TaskCard } from '../components';
 import { PlantingForm } from './Plantings';
 import { nf, rp } from '../lib/calc';
+import { defSprayTanks } from '../lib/needs';
 import type { Category, Planting, Task } from '../lib/types';
 
 type Tab = 'jadwal' | 'kalender' | 'panen' | 'info';
@@ -37,7 +38,7 @@ export default function PlantingDetail() {
 
   return (
     <>
-      <PageHead kicker={`${p.variety === 'rawit' ? 'Cabai rawit' : 'Cabai keriting'} · tanam ${fmt(p.plantDate)}`} title={p.name}>
+      <PageHead back={{ to: '/lahan', label: 'Lahan' }} kicker={`${p.variety === 'rawit' ? 'Cabai rawit' : 'Cabai keriting'} · tanam ${fmt(p.plantDate)}`} title={p.name}>
         <div className="statline">
           <span className="pill big">{hst < 0 ? `H${hst}` : `${hst} HST`}</span>
           <span>{stageOf(hst)}</span>
@@ -93,6 +94,7 @@ export default function PlantingDetail() {
                 <dt>Lubang susulan</dt><dd>{p.holes} per tanaman</dd>
                 <dt>Geser jadwal</dt><dd>{p.shift} hari</dd>
                 <dt>Modal</dt><dd>{p.capital ? rp(p.capital) : '—'}</dd>
+                <dt>Tangki spray/aplikasi</dt><dd>{p.sprayTanks ?? defSprayTanks(p.plants)} × 16 L</dd>
                 <dt>Tugas opsional</dt><dd>{p.includeSaran ? 'Disertakan' : 'Tidak'}</dd>
               </dl>
               <div className="row">
@@ -146,6 +148,7 @@ function HarvestTab({ p }: { p: Planting }) {
   const [kg, setKg] = useState('');
   const [price, setPrice] = useState('');
   const totalKg = list.reduce((a, h) => a + h.kg, 0);
+  const spent = s.entries.filter((e) => e.kind === 'beli' && e.plantingId === p.id).reduce((a, e) => a + e.total, 0);
   const revenue = list.reduce((a, h) => a + h.kg * (h.price ?? 0), 0);
   return (
     <>
@@ -160,6 +163,7 @@ function HarvestTab({ p }: { p: Planting }) {
             Modal {rp(p.capital)} · {revenue >= p.capital ? `sudah balik modal, laba ${rp(revenue - p.capital)}` : `sisa ${rp(p.capital - revenue)} menuju balik modal`}
           </p>
         ) : <p className="muted small">Isi modal di tab Info untuk melihat balik modal.</p>}
+        {spent > 0 && <p className="muted small">Belanja tercatat untuk lahan ini: <b>{rp(spent)}</b>{revenue > 0 ? ` · selisih terhadap pendapatan ${rp(revenue - spent)}` : ''}</p>}
       </section>
       <form className="card form" onSubmit={(e) => {
         e.preventDefault();

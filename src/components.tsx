@@ -1,4 +1,5 @@
 import { useState, type ReactNode } from 'react';
+import { Link } from 'react-router-dom';
 import type { Source, Task } from './lib/types';
 import { CAT } from './lib/schedule';
 import type { Block } from './data/guide';
@@ -12,15 +13,27 @@ const SRC: Record<Source, { label: string; cls: string }> = {
 
 export const Badge = ({ s }: { s: Source }) => <span className={'badge ' + SRC[s].cls}>{SRC[s].label}</span>;
 
-export function PageHead({ kicker, title, children }: { kicker?: string; title: string; children?: ReactNode }) {
+export function PageHead({ kicker, title, back, children }: { kicker?: string; title: string; back?: { to: string; label: string }; children?: ReactNode }) {
   return (
-    <header className="head">
+    <header className="hero">
+      {back && <Link to={back.to} className="back">‹ {back.label}</Link>}
       {kicker && <div className="kicker">{kicker}</div>}
       <h1>{title}</h1>
       {children}
     </header>
   );
 }
+
+const ICONS: Record<string, string> = {
+  home: 'M3 11.5 12 4l9 7.5M5.5 10v9.5h13V10',
+  sprout: 'M12 21v-8m0 0c0-4 3-6 7-6 0 4-3 6-7 6zm0 2c0-3-2.5-5-6-5 0 3 2.5 5 6 5z',
+  cart: 'M3 4h2l2.4 11h10.2L20 8H6.5M9 20h.01M17 20h.01',
+  book: 'M4 5.5A2.5 2.5 0 0 1 6.5 3H20v16H6.5A2.5 2.5 0 0 0 4 21.5zM8 7h8',
+  sliders: 'M4 7h10M18 7h2M4 17h2M10 17h10M14 5v4M6 15v4'
+};
+export const Icon = ({ n }: { n: keyof typeof ICONS }) => (
+  <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" aria-hidden><path d={ICONS[n]} /></svg>
+);
 
 export function TaskCard({
   task, done, onToggle, planting, today
@@ -38,8 +51,8 @@ export function TaskCard({
           <div className="task-meta">
             <span className="chip" style={{ background: c.color }}>{c.label}</span>
             <span>{task.hst < 0 ? `H${task.hst}` : `${task.hst} HST`}</span>
-            <span>· {fmtShort(task.date)}</span>
-            {overdue && <span className="late-tag">terlambat {relative(task.date, today)}</span>}
+            <span>· {fmtShort(task.date)}{overdue ? ` (${relative(task.date, today)})` : ''}</span>
+            {overdue && <span className="late-tag">⚠ terlambat</span>}
           </div>
           <div className="task-title">{task.title}</div>
           {planting && <div className="task-sub">{planting} · {task.method}</div>}

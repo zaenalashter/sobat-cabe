@@ -16,6 +16,7 @@ export function PlantingForm({ initial, onSubmit, onCancel, submitLabel }: {
   const [holes, setHoles] = useState<1 | 2>(initial?.holes ?? 1);
   const [shift, setShift] = useState(String(initial?.shift ?? 0));
   const [saran, setSaran] = useState(initial?.includeSaran ?? true);
+  const [tanks, setTanks] = useState(initial?.sprayTanks ? String(initial.sprayTanks) : '');
   const [capital, setCapital] = useState(initial?.capital ? String(initial.capital) : '');
 
   const pickVariety = (v: Variety) => {
@@ -28,7 +29,8 @@ export function PlantingForm({ initial, onSubmit, onCancel, submitLabel }: {
       e.preventDefault();
       onSubmit({
         name: name.trim() || 'Lahan baru', variety, plantDate, plants: Math.max(1, parseInt(plants) || 1), holes,
-        shift: parseInt(shift) || 0, includeSaran: saran, capital: capital ? Number(capital) : undefined
+        shift: parseInt(shift) || 0, includeSaran: saran, capital: capital ? Number(capital) : undefined,
+        sprayTanks: tanks ? Math.max(1, parseInt(tanks)) : undefined
       });
     }}>
       <label>Nama lahan / bedengan
@@ -55,6 +57,10 @@ export function PlantingForm({ initial, onSubmit, onCancel, submitLabel }: {
       <label>Geser jadwal pasca-tanam (hari)
         <input type="number" inputMode="numeric" value={shift} onChange={(e) => setShift(e.target.value)} />
         <small>Basis jadwal = cabai rawit. Keriting berfase generatif lebih cepat; Mas Udin menganjurkan jadwal “dimajukan” sesuai kondisi tanaman — isi negatif (mis. -5) untuk memajukan. Tidak menggeser tugas sebelum tanam.</small>
+      </label>
+      <label>Tangki spray 16 L per aplikasi (opsional)
+        <input type="number" inputMode="numeric" min={1} value={tanks} onChange={(e) => setTanks(e.target.value)} placeholder="otomatis ±1 per 300 tanaman" />
+        <small>Dipakai untuk menghitung total bahan spray di daftar belanja. Sesuaikan dengan hasil semprot nyata Anda.</small>
       </label>
       <label>Modal (Rp, opsional)
         <input type="number" inputMode="numeric" min={0} value={capital} onChange={(e) => setCapital(e.target.value)} placeholder="3570000" />
