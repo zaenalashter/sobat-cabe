@@ -1,5 +1,6 @@
 import { useState, type ReactNode } from 'react';
 import { Link } from 'react-router-dom';
+import { isDarkNow, setTheme, useTheme } from './lib/theme';
 import type { Source, Task } from './lib/types';
 import { CAT } from './lib/schedule';
 import type { Block } from './data/guide';
@@ -14,8 +15,13 @@ const SRC: Record<Source, { label: string; cls: string }> = {
 export const Badge = ({ s }: { s: Source }) => <span className={'badge ' + SRC[s].cls}>{SRC[s].label}</span>;
 
 export function PageHead({ kicker, title, back, children }: { kicker?: string; title: string; back?: { to: string; label: string }; children?: ReactNode }) {
+  const theme = useTheme();
+  const dark = isDarkNow(theme);
   return (
     <header className="hero">
+      <button className="theme-btn" onClick={() => setTheme(dark ? 'light' : 'dark')} aria-label={dark ? 'Ganti ke tema terang' : 'Ganti ke tema gelap'}>
+        {dark ? '☀' : '☾'}
+      </button>
       {back && <Link to={back.to} className="back">‹ {back.label}</Link>}
       {kicker && <div className="kicker">{kicker}</div>}
       <h1>{title}</h1>

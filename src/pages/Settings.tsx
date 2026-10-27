@@ -2,11 +2,13 @@ import { useRef, useState } from 'react';
 import { actions, useStore } from '../lib/store';
 import { PageHead } from '../components';
 import { requestNotify } from '../lib/notify';
+import { setTheme, useTheme, type Theme } from '../lib/theme';
 
 export default function SettingsPage() {
   const s = useStore();
   const file = useRef<HTMLInputElement>(null);
   const [msg, setMsg] = useState('');
+  const theme = useTheme();
 
   const backup = () => {
     const url = URL.createObjectURL(new Blob([actions.exportJSON()], { type: 'application/json' }));
@@ -18,6 +20,14 @@ export default function SettingsPage() {
   return (
     <>
       <PageHead kicker="Aplikasi" title="Pengaturan" />
+      <section className="card">
+        <h2 className="sec first">Tema tampilan</h2>
+        <div className="seg" role="radiogroup" aria-label="Tema">
+          {([['light', 'Terang'], ['dark', 'Gelap'], ['system', 'Ikuti sistem']] as [Theme, string][]).map(([t, l]) => (
+            <button key={t} role="radio" aria-checked={theme === t} className={theme === t ? 'on' : ''} onClick={() => setTheme(t)}>{l}</button>
+          ))}
+        </div>
+      </section>
       <section className="card">
         <h2 className="sec first">Pengingat</h2>
         <label className="check-row">
